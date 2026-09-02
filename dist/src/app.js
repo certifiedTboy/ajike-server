@@ -10,7 +10,7 @@ class ExpressApp extends App {
     routes() {
         this.app.get("/", (__, res) => {
             res.json({ message: "Server is live" });
-        }, express());
+        });
         this.app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
         this.app.use("/api/v1/users", new UserRoutes().routes);
         this.app.use("/api/v1/auth", new AuthRoutes().routes);
@@ -24,6 +24,6 @@ const newApp = new ExpressApp({
         "https://ajike-pest-control-tau.vercel.app",
     ],
     credentials: true,
-});
+}, express());
 const { app } = newApp;
 export default app;
