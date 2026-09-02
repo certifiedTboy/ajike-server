@@ -13,18 +13,20 @@ import { notFoundException } from "./exceptions/not-found-exception.ts";
 import { globalExceptionHandler } from "./exceptions/global-exception-handler.ts";
 
 const isVercel = process.env.VERCEL === "1";
-const fileTransports = [
-  new transports.File({
-    filename: "logs/error.log",
-    level: "error",
-  }),
-  new transports.File({ filename: "logs/combined.log" }),
-];
+const loggerTransports = isVercel
+  ? [new transports.Console()]
+  : [
+      new transports.File({
+        filename: "logs/error.log",
+        level: "error",
+      }),
+      new transports.File({ filename: "logs/combined.log" }),
+    ];
 
 export const logger: Logger = createLogger({
   level: "info",
   format: format.json(),
-  transports: isVercel ? [new transports.Console()] : fileTransports,
+  transports: loggerTransports,
 
   exceptionHandlers: isVercel
     ? [new transports.Console()]
