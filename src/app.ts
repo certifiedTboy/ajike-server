@@ -1,4 +1,5 @@
 import { App } from "./lib/App.ts";
+import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./helpers/swagger-spec.ts";
 import { UserRoutes } from "./users/user-routes.ts";
@@ -31,7 +32,7 @@ const newApp = new ExpressApp({
     "https://ajike-pest-control-tau.vercel.app",
   ],
   credentials: true,
-});
+}, express());
 const { app } = newApp;
 
 export default app;

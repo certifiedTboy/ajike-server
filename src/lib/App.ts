@@ -37,8 +37,8 @@ export abstract class App {
   public logger: Logger;
   public limiter: any;
 
-  constructor(corsConfig: CorsOptions) {
-    this.app = express();
+  constructor(corsConfig: CorsOptions, application: Application = express()) {
+    this.app = application;
     this.limiter = rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       limit: 200, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
