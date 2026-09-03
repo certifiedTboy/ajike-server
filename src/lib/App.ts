@@ -13,20 +13,18 @@ import { notFoundException } from "./exceptions/not-found-exception.ts";
 import { globalExceptionHandler } from "./exceptions/global-exception-handler.ts";
 
 const isVercel = process.env.VERCEL === "1";
-const loggerTransports = isVercel
-  ? [new transports.Console()]
-  : [
-      new transports.File({
-        filename: "logs/error.log",
-        level: "error",
-      }),
-      new transports.File({ filename: "logs/combined.log" }),
-    ];
+const fileTransports = [
+  new transports.File({
+    filename: "logs/error.log",
+    level: "error",
+  }),
+  new transports.File({ filename: "logs/combined.log" }),
+];
 
 export const logger: Logger = createLogger({
   level: "info",
   format: format.json(),
-  transports: loggerTransports,
+  transports: isVercel ? [new transports.Console()] : fileTransports,
 
   exceptionHandlers: isVercel
     ? [new transports.Console()]
@@ -39,9 +37,8 @@ export abstract class App {
   public logger: Logger;
   public limiter: any;
 
-  constructor(corsConfig: CorsOptions, application: Application = express()) {
-    this.app = application;
-    this.app.set("trust proxy", 1);
+  constructor(corsConfig: CorsOptions) {
+    this.app = express();
     this.limiter = rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       limit: 200, // Limit each IP to 100 requests per `window` (here, per 15 minutes).

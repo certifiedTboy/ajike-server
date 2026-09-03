@@ -7,19 +7,17 @@ import { rateLimit } from "express-rate-limit";
 import { notFoundException } from "./exceptions/not-found-exception.js";
 import { globalExceptionHandler } from "./exceptions/global-exception-handler.js";
 const isVercel = process.env.VERCEL === "1";
-const loggerTransports = isVercel
-    ? [new transports.Console()]
-    : [
-        new transports.File({
-            filename: "logs/error.log",
-            level: "error",
-        }),
-        new transports.File({ filename: "logs/combined.log" }),
-    ];
+const fileTransports = [
+    new transports.File({
+        filename: "logs/error.log",
+        level: "error",
+    }),
+    new transports.File({ filename: "logs/combined.log" }),
+];
 export const logger = createLogger({
     level: "info",
     format: format.json(),
-    transports: loggerTransports,
+    transports: isVercel ? [new transports.Console()] : fileTransports,
     exceptionHandlers: isVercel
         ? [new transports.Console()]
         : [new transports.File({ filename: "logs/exceptions.log" })],
@@ -29,9 +27,8 @@ export class App {
     corsConfig;
     logger;
     limiter;
-    constructor(corsConfig, application = express()) {
-        this.app = application;
-        this.app.set("trust proxy", 1);
+    constructor(corsConfig) {
+        this.app = express();
         this.limiter = rateLimit({
             windowMs: 15 * 60 * 1000, // 15 minutes
             limit: 200, // Limit each IP to 100 requests per `window` (here, per 15 minutes).

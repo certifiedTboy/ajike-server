@@ -1,6 +1,6 @@
 import EventEmitter from "node:events";
 import cron, { type ScheduledTask } from "node-cron";
-import EmailService from "./smtp.ts";
+// import EmailService from "./smtp.ts";
 import { type IEventData, type EventTypes } from "../lib/types.ts";
 import { ServiceServices } from "../service/service-services.ts";
 import { EMAIL_FROM } from "../lib/constants.ts";
@@ -126,10 +126,9 @@ export class AppEvents extends EventEmitter {
         try {
           await this.runEvent(name, eventData);
         } catch (error) {
-          logger.error(
-            `Failed to run immediate job for ${eventData.id}:`,
-            { error },
-          );
+          logger.error(`Failed to run immediate job for ${eventData.id}:`, {
+            error,
+          });
         } finally {
           // Unlock the job ID
           this.activeJobs.delete(eventData.id);
@@ -169,10 +168,9 @@ export class AppEvents extends EventEmitter {
       try {
         await this.runEvent(name, eventData);
       } catch (error) {
-        logger.error(
-          `Failed to run scheduled job for ${eventData.id}:`,
-          { error },
-        );
+        logger.error(`Failed to run scheduled job for ${eventData.id}:`, {
+          error,
+        });
       } finally {
         // The `finally` block ensures that we clean up, regardless of success or failure.
         // Remove the email from the active jobs set to unlock it for future jobs.
@@ -192,44 +190,44 @@ export class AppEvents extends EventEmitter {
     switch (name) {
       case "new-user":
         // Use the EmailService to send a welcome email with the OTP.
-        await EmailService.sendEmail(
-          [eventData?.email!],
-          "Welcome! Verify Your Account",
-          "create-account",
-          { name: eventData.firstName, otp: eventData.otp },
-        );
+        // await EmailService.sendEmail(
+        //   [eventData?.email!],
+        //   "Welcome! Verify Your Account",
+        //   "create-account",
+        //   { name: eventData.firstName, otp: eventData.otp },
+        // );
         // this email field will be undefined
         // ill check it later
         logger.info(`Verification email sent to ${eventData.email}`);
         break;
 
       case "user-verified":
-        await EmailService.sendEmail(
-          [eventData?.email!],
-          "Account Verified!",
-          "account-verified",
-          { name: eventData.firstName },
-        );
+        // await EmailService.sendEmail(
+        //   [eventData?.email!],
+        //   "Account Verified!",
+        //   "account-verified",
+        //   { name: eventData.firstName },
+        // );
         logger.info(`Verification email sent to ${eventData.email}`);
         break;
 
       case "password-reset":
-        await EmailService.sendEmail(
-          [eventData?.email!],
-          "Password Reset Request",
-          "password-reset",
-          { name: eventData.firstName, otp: eventData.otp },
-        );
+        // await EmailService.sendEmail(
+        //   [eventData?.email!],
+        //   "Password Reset Request",
+        //   "password-reset",
+        //   { name: eventData.firstName, otp: eventData.otp },
+        // );
         logger.info(`Password reset email sent to ${eventData.email}`);
         break;
 
       case "password-changed":
-        await EmailService.sendEmail(
-          [eventData?.email!],
-          "Your Password Has Been Changed",
-          "password-changed",
-          { name: eventData.firstName },
-        );
+        // await EmailService.sendEmail(
+        //   [eventData?.email!],
+        //   "Your Password Has Been Changed",
+        //   "password-changed",
+        //   { name: eventData.firstName },
+        // );
         logger.info(`Password changed confirmation sent to ${eventData.email}`);
         break;
 
@@ -263,9 +261,11 @@ export class AppEvents extends EventEmitter {
           await ServiceServices.giveFeedback(
             eventData?.serviceId,
             eventData?.userId,
-            eventData?.serviceData?.text,
-            eventData?.serviceData?.rating,
+            eventData?.feedbackData?.text,
+            eventData?.feedbackData?.rating,
+            eventData?.feedbackData?.updateServiceData,
           );
+
           logger.info("new feedback added");
         }
         break;
@@ -276,44 +276,44 @@ export class AppEvents extends EventEmitter {
             _id: eventData?.serviceData?.user,
           });
 
-          const data = eventData?.serviceData;
+          // const data = eventData?.serviceData;
 
           if (EMAIL_FROM) {
-            await EmailService.sendEmail(
-              ["etosin70@gmail.com"],
-              "New Service request",
-              "new-service",
-              {
-                title: data?.title || "New cleaning service",
-                status: data?.status || "New",
-                propertyType: data?.propertyType || "Not Provided",
-                category: data?.category || "Not Provided",
-                serviceLocation: data?.serviceLocation || "Not Provided",
-                plan: data?.plan || "Not Provided",
-                budget: data?.budget || "Not Provided",
-                address: data?.address || "Not Provided",
-                name: user?.firstName + " " + user?.lastName,
-                summary: data?.description,
-                phoneNumber: user?.phoneNumber,
-                email: user?.email,
-              },
-            );
+            // await EmailService.sendEmail(
+            //   ["etosin70@gmail.com"],
+            //   "New Service request",
+            //   "new-service",
+            //   {
+            //     title: data?.title || "New cleaning service",
+            //     status: data?.status || "New",
+            //     propertyType: data?.propertyType || "Not Provided",
+            //     category: data?.category || "Not Provided",
+            //     serviceLocation: data?.serviceLocation || "Not Provided",
+            //     plan: data?.plan || "Not Provided",
+            //     budget: data?.budget || "Not Provided",
+            //     address: data?.address || "Not Provided",
+            //     name: user?.firstName + " " + user?.lastName,
+            //     summary: data?.description,
+            //     phoneNumber: user?.phoneNumber,
+            //     email: user?.email,
+            //   },
+            // );
 
             logger.info(
               `New service request update has been sent to ${EMAIL_FROM}`,
             );
           }
           if (user) {
-            await EmailService.sendEmail(
-              [user?.email],
-              "Your Service request has been received",
-              "new-service-user",
-              {
-                title: data?.title || "New cleaning service",
-                status: data?.status || "New",
-                name: user?.firstName + " " + user?.lastName,
-              },
-            );
+            // await EmailService.sendEmail(
+            //   [user?.email],
+            //   "Your Service request has been received",
+            //   "new-service-user",
+            //   {
+            //     title: data?.title || "New cleaning service",
+            //     status: data?.status || "New",
+            //     name: user?.firstName + " " + user?.lastName,
+            //   },
+            // );
             logger.info(
               `New service request update has been sent to ${user?.email}`,
             );
@@ -327,21 +327,21 @@ export class AppEvents extends EventEmitter {
             _id: eventData?.serviceData?.user,
           });
 
-          const data = eventData?.serviceData;
+          // const _data = eventData?.serviceData;
 
           if (user) {
-            await EmailService.sendEmail(
-              [user?.email!],
-              "Your service has a new status",
-              "update-service",
-              {
-                title: data?.title,
-                status: data?.status,
-                category: data?.category,
-                propertyType: data?.propertyType,
-                name: user?.firstName,
-              },
-            );
+            // await EmailService.sendEmail(
+            //   [user?.email!],
+            //   "Your service has a new status",
+            //   "update-service",
+            //   {
+            //     title: data?.title,
+            //     status: data?.status,
+            //     category: data?.category,
+            //     propertyType: data?.propertyType,
+            //     name: user?.firstName,
+            //   },
+            // );
           }
 
           logger.info(`Service update has been sent to ${user?.email}`);

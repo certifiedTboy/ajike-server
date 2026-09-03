@@ -22,6 +22,7 @@ const serviceSchema = new Schema({
     postcode: { type: String },
     preferredDate: { type: String },
     periodCovered: { type: String, default: "0" },
+    isReviewed: { type: Boolean, default: false },
 }, { timestamps: true });
 export const Service = model("service", serviceSchema);
 const feedbackSchema = new Schema({

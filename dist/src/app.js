@@ -1,5 +1,4 @@
 import { App } from "./lib/App.js";
-import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./helpers/swagger-spec.js";
 import { UserRoutes } from "./users/user-routes.js";
@@ -21,6 +20,6 @@ class ExpressApp extends App {
 const newApp = new ExpressApp({
     origin: ["http://localhost:5173", "https://ajike-pest-control.vercel.app"],
     credentials: true,
-}, express());
+});
 const { app } = newApp;
 export default app;

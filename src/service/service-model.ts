@@ -50,6 +50,7 @@ export interface IService extends Document {
   serviceState: StateType;
   serviceCity: CityType;
   postcode: string;
+  isReviewed: boolean;
 }
 
 const serviceSchema = new Schema<IService>(
@@ -77,6 +78,7 @@ const serviceSchema = new Schema<IService>(
     postcode: { type: String },
     preferredDate: { type: String },
     periodCovered: { type: String, default: "0" },
+    isReviewed: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

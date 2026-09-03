@@ -42,6 +42,12 @@ export class ServiceRoutes extends AppRoutesHandler {
       ServiceControllers.getServicesByUser,
     );
 
+    this.routes.get(
+      "/user/completed-services",
+      this.authGuard,
+      ServiceControllers.getAllCompletedServicesByUser,
+    );
+
     this.routes.post(
       "/:serviceId/feedback",
       this.authGuard,
@@ -50,7 +56,11 @@ export class ServiceRoutes extends AppRoutesHandler {
       ServiceControllers.addFeedback,
     );
 
-    this.routes.get("/feedback", ServiceControllers.getAllFeedbacks);
+    this.routes.get(
+      "/feedback",
+      this.adminGuard,
+      ServiceControllers.getAllFeedbacks,
+    );
 
     this.routes.put(
       "/:serviceId",

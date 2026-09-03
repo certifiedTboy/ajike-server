@@ -79,6 +79,19 @@ export class ServiceControllers {
         }
     }
     /**
+     * @static getAllCompletedServicesByUser
+     * @description Handles getting all completed services by a user.
+     */
+    static async getAllCompletedServicesByUser(req, res, next) {
+        try {
+            const result = await ServiceServices.getCompletedServicesByUser(req?.user?.id);
+            ResponseHandler.ok(res, 202, "Post update has been queued.", result);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    /**
      * @static getAllFeedbacks
      * @description handles get all feedbacks
      */
@@ -105,8 +118,8 @@ export class ServiceControllers {
      */
     static async getAllFeedbacks(req, res, next) {
         try {
-            const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
+            const page = parseInt(req.query.page);
+            const limit = 1;
             const result = await ServiceServices.getAllFeedbacks(page, limit);
             ResponseHandler.ok(res, 202, "retrieved feedbacks successfully.", result);
         }

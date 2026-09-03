@@ -176,6 +176,21 @@ export class ServiceServices {
         };
     }
     /**
+     * @static getCompletedServicesByUser
+     * @description Retrieves a list of completed services by a user.
+     * @param {string} userId - id of the user
+     */
+    static async getCompletedServicesByUser(userId) {
+        const userObjectId = new Types.ObjectId(userId);
+        const services = Service.find({
+            // @ts-ignore
+            user: userObjectId,
+            status: "completed",
+            isReviewed: false,
+        }).populate("user", "firstName lastName email phoneNumber role picture");
+        return services;
+    }
+    /**
      * @static getNewServicesByUser
      * @description Retrieves a list of services with pagination.
      * @param {number} limit - The number of posts to return.
@@ -567,7 +582,7 @@ export class ServiceServices {
      * @param {string} rating - number rating of the feedback
      * @returns {Promise<IFeeback>} A promise that resolves to the new feedback.
      */
-    static async giveFeedback(serviceId, userId, text, rating = null) {
+    static async giveFeedback(serviceId, userId, text, rating = null, updateServiceData) {
         const feedback = new Feedback({
             service: serviceId,
             user: userId,
@@ -575,6 +590,7 @@ export class ServiceServices {
             rating,
         });
         await feedback.save();
+        await this.updateService(serviceId, { ...updateServiceData, isReviewed: true }, userId);
         return feedback;
     }
     /**
@@ -582,16 +598,161 @@ export class ServiceServices {
      * @description Retrieves all feedbacks.
      * @param {number} limit - The number of comments to return.
      * @param {number} page - The page number.
-     * @returns {Promise<{feedbacks: IFeedback[], total: number}>} A promise that resolves to the comments and total count.
      */
-    static async getAllFeedbacks(limit, page) {
-        const feedbacks = await Feedback.find()
-            .populate("user", "firstName lastName picture")
-            .populate("service", "title")
-            .sort({ createdAt: -1 })
-            .limit(limit)
-            .skip(limit * (page - 1));
-        const total = await Feedback.countDocuments();
-        return { feedbacks, total };
+    static async getAllFeedbacks(page, limit) {
+        if (page === 1) {
+            const skip = limit * (page - 1);
+            const [result, completedServices] = await Promise.all([
+                Feedback.aggregate([
+                    {
+                        $facet: {
+                            // ==========================================
+                            // PAGINATED FEEDBACKS
+                            // ==========================================
+                            feedbacks: [
+                                {
+                                    $sort: {
+                                        createdAt: -1,
+                                    },
+                                },
+                                {
+                                    $skip: skip,
+                                },
+                                {
+                                    $limit: limit,
+                                },
+                                // Populate user
+                                {
+                                    $lookup: {
+                                        from: "users",
+                                        localField: "user",
+                                        foreignField: "_id",
+                                        as: "user",
+                                    },
+                                },
+                                {
+                                    $unwind: {
+                                        path: "$user",
+                                        preserveNullAndEmptyArrays: true,
+                                    },
+                                },
+                                // Populate service
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service",
+                                    },
+                                },
+                                {
+                                    $unwind: {
+                                        path: "$service",
+                                        preserveNullAndEmptyArrays: true,
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        "user.password": 0,
+                                        "user.otp": 0,
+                                        "user.otpExpiry": 0,
+                                    },
+                                },
+                            ],
+                            // ==========================================
+                            // RATING STATISTICS
+                            // ==========================================
+                            ratingStatistics: [
+                                {
+                                    $addFields: {
+                                        ratingNumber: {
+                                            $convert: {
+                                                input: "$rating",
+                                                to: "double",
+                                                onError: 0,
+                                                onNull: 0,
+                                            },
+                                        },
+                                    },
+                                },
+                                {
+                                    $group: {
+                                        _id: null,
+                                        totalFeedbacks: {
+                                            $sum: 1,
+                                        },
+                                        // 5 stars
+                                        totalFiveStars: {
+                                            $sum: {
+                                                $cond: [{ $eq: ["$ratingNumber", 5] }, 1, 0],
+                                            },
+                                        },
+                                        // 4 stars
+                                        totalFourStars: {
+                                            $sum: {
+                                                $cond: [{ $eq: ["$ratingNumber", 4] }, 1, 0],
+                                            },
+                                        },
+                                        // 3 stars
+                                        totalThreeStars: {
+                                            $sum: {
+                                                $cond: [{ $eq: ["$ratingNumber", 3] }, 1, 0],
+                                            },
+                                        },
+                                        // 2 stars
+                                        totalTwoStars: {
+                                            $sum: {
+                                                $cond: [{ $eq: ["$ratingNumber", 2] }, 1, 0],
+                                            },
+                                        },
+                                        // 1 star
+                                        totalOneStar: {
+                                            $sum: {
+                                                $cond: [{ $eq: ["$ratingNumber", 1] }, 1, 0],
+                                            },
+                                        },
+                                        // Average rating
+                                        totalRating: {
+                                            $sum: "$ratingNumber",
+                                        },
+                                    },
+                                },
+                                {
+                                    $addFields: {
+                                        averageRating: {
+                                            $cond: [
+                                                { $gt: ["$totalFeedbacks", 0] },
+                                                {
+                                                    $divide: ["$totalRating", "$totalFeedbacks"],
+                                                },
+                                                0,
+                                            ],
+                                        },
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        totalRating: 0,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ]),
+                Service.countDocuments({
+                    status: "completed",
+                }),
+            ]);
+            return { ...result, completedServices };
+        }
+        else {
+            const feedbacks = await Feedback.find()
+                .populate("user", "-password")
+                .populate("service")
+                .sort({ createdAt: -1 })
+                .limit(limit)
+                .skip(limit * (page - 1));
+            return feedbacks;
+        }
     }
 }

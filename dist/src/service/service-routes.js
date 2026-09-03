@@ -22,8 +22,9 @@ export class ServiceRoutes extends AppRoutesHandler {
         this.routes.post("/", this.authGuard, AppHelpers.sanitizeBody, this.getCreateServiceValidationRules(), this.checkValidationResult, ServiceControllers.createService);
         this.routes.get("/admin", this.adminGuard, ServiceControllers.getAllServicesByAdmin);
         this.routes.get("/user", this.authGuard, ServiceControllers.getServicesByUser);
+        this.routes.get("/user/completed-services", this.authGuard, ServiceControllers.getAllCompletedServicesByUser);
         this.routes.post("/:serviceId/feedback", this.authGuard, this.getFeedbackValidationRules(), this.checkValidationResult, ServiceControllers.addFeedback);
-        this.routes.get("/feedback", ServiceControllers.getAllFeedbacks);
+        this.routes.get("/feedback", this.adminGuard, ServiceControllers.getAllFeedbacks);
         this.routes.put("/:serviceId", this.authGuard, AppHelpers.sanitizeBody, this.getCreateServiceValidationRules(), this.checkValidationResult, ServiceControllers.updateService);
     }
     /**
