@@ -264,31 +264,10 @@ export class ServiceServices {
     if (page === 1) {
       const skip = limit * (page - 1);
 
-      const today = moment().startOf("day");
-
-      // If today is Sunday, start from Monday
-      const startDate =
-        today.day() === 0 ? today.clone().add(1, "day") : today.clone();
-
-      // Find the 7th valid service day
-      let endDate = startDate.clone();
-      let serviceDays = 1;
-
-      while (serviceDays < 7) {
-        endDate.add(1, "day");
-
-        // Sunday = 0
-        if (endDate.day() !== 0) {
-          serviceDays++;
-        }
-      }
-
-      const weeklyStartDate = startDate.format("YYYY-MM-DD");
-      const weeklyEndDate = endDate.format("YYYY-MM-DD");
-
       const result = await Service.aggregate([
         {
           $facet: {
+            // Paginated services
             services: [
               {
                 $sort: {
@@ -324,9 +303,11 @@ export class ServiceServices {
               },
             ],
 
+            // Statistics for ALL services
             statistics: [
               {
                 $addFields: {
+                  // Convert "100", "20", etc. into numbers
                   budgetNumber: {
                     $convert: {
                       input: "$budget",
@@ -337,7 +318,9 @@ export class ServiceServices {
                   },
 
                   normalizedStatus: {
-                    $toLower: "$status",
+                    $toLower: {
+                      $ifNull: ["$status", ""],
+                    },
                   },
                 },
               },
@@ -346,46 +329,67 @@ export class ServiceServices {
                 $group: {
                   _id: null,
 
+                  // ALL SERVICES
                   totalServices: {
                     $sum: 1,
                   },
 
+                  // Total value of ALL services
                   totalValue: {
                     $sum: "$budgetNumber",
                   },
 
+                  // PENDING
                   totalPendingServices: {
                     $sum: {
-                      $cond: [{ $eq: ["$normalizedStatus", "pending"] }, 1, 0],
+                      $cond: [
+                        {
+                          $eq: ["$normalizedStatus", "pending"],
+                        },
+                        1,
+                        0,
+                      ],
                     },
                   },
 
                   totalPendingValue: {
                     $sum: {
                       $cond: [
-                        { $eq: ["$normalizedStatus", "pending"] },
+                        {
+                          $eq: ["$normalizedStatus", "pending"],
+                        },
                         "$budgetNumber",
                         0,
                       ],
                     },
                   },
 
+                  // NEW
                   totalNewServices: {
                     $sum: {
-                      $cond: [{ $eq: ["$normalizedStatus", "new"] }, 1, 0],
+                      $cond: [
+                        {
+                          $eq: ["$normalizedStatus", "new"],
+                        },
+                        1,
+                        0,
+                      ],
                     },
                   },
 
                   totalNewValue: {
                     $sum: {
                       $cond: [
-                        { $eq: ["$normalizedStatus", "new"] },
+                        {
+                          $eq: ["$normalizedStatus", "new"],
+                        },
                         "$budgetNumber",
                         0,
                       ],
                     },
                   },
 
+                  // COMPLETED
                   totalCompletedServices: {
                     $sum: {
                       $cond: [
@@ -410,18 +414,12 @@ export class ServiceServices {
                     },
                   },
 
-                  totalWeeklyServices: {
+                  // CANCELLED
+                  totalCancelledServices: {
                     $sum: {
                       $cond: [
                         {
-                          $and: [
-                            {
-                              $gte: ["$preferredDate", weeklyStartDate],
-                            },
-                            {
-                              $lte: ["$preferredDate", weeklyEndDate],
-                            },
-                          ],
+                          $eq: ["$normalizedStatus", "cancelled"],
                         },
                         1,
                         0,
@@ -429,156 +427,24 @@ export class ServiceServices {
                     },
                   },
 
-                  totalWeeklyValue: {
+                  totalCancelledValue: {
                     $sum: {
                       $cond: [
                         {
-                          $and: [
-                            {
-                              $gte: ["$preferredDate", weeklyStartDate],
-                            },
-                            {
-                              $lte: ["$preferredDate", weeklyEndDate],
-                            },
-                          ],
+                          $eq: ["$normalizedStatus", "cancelled"],
                         },
                         "$budgetNumber",
                         0,
                       ],
                     },
                   },
+                },
+              },
 
-                  totalWeeklyNewServices: {
-                    $sum: {
-                      $cond: [
-                        {
-                          $and: [
-                            {
-                              $gte: ["$preferredDate", weeklyStartDate],
-                            },
-                            {
-                              $lte: ["$preferredDate", weeklyEndDate],
-                            },
-                            {
-                              $eq: ["$normalizedStatus", "new"],
-                            },
-                          ],
-                        },
-                        1,
-                        0,
-                      ],
-                    },
-                  },
-
-                  totalWeeklyNewValue: {
-                    $sum: {
-                      $cond: [
-                        {
-                          $and: [
-                            {
-                              $gte: ["$preferredDate", weeklyStartDate],
-                            },
-                            {
-                              $lte: ["$preferredDate", weeklyEndDate],
-                            },
-                            {
-                              $eq: ["$normalizedStatus", "new"],
-                            },
-                          ],
-                        },
-                        "$budgetNumber",
-                        0,
-                      ],
-                    },
-                  },
-
-                  totalWeeklyPendingServices: {
-                    $sum: {
-                      $cond: [
-                        {
-                          $and: [
-                            {
-                              $gte: ["$preferredDate", weeklyStartDate],
-                            },
-                            {
-                              $lte: ["$preferredDate", weeklyEndDate],
-                            },
-                            {
-                              $eq: ["$normalizedStatus", "pending"],
-                            },
-                          ],
-                        },
-                        1,
-                        0,
-                      ],
-                    },
-                  },
-
-                  totalWeeklyPendingValue: {
-                    $sum: {
-                      $cond: [
-                        {
-                          $and: [
-                            {
-                              $gte: ["$preferredDate", weeklyStartDate],
-                            },
-                            {
-                              $lte: ["$preferredDate", weeklyEndDate],
-                            },
-                            {
-                              $eq: ["$normalizedStatus", "pending"],
-                            },
-                          ],
-                        },
-                        "$budgetNumber",
-                        0,
-                      ],
-                    },
-                  },
-
-                  totalWeeklyCompletedServices: {
-                    $sum: {
-                      $cond: [
-                        {
-                          $and: [
-                            {
-                              $gte: ["$preferredDate", weeklyStartDate],
-                            },
-                            {
-                              $lte: ["$preferredDate", weeklyEndDate],
-                            },
-                            {
-                              $eq: ["$normalizedStatus", "completed"],
-                            },
-                          ],
-                        },
-                        1,
-                        0,
-                      ],
-                    },
-                  },
-
-                  totalWeeklyCompletedValue: {
-                    $sum: {
-                      $cond: [
-                        {
-                          $and: [
-                            {
-                              $gte: ["$preferredDate", weeklyStartDate],
-                            },
-                            {
-                              $lte: ["$preferredDate", weeklyEndDate],
-                            },
-                            {
-                              $eq: ["$normalizedStatus", "completed"],
-                            },
-                          ],
-                        },
-                        "$budgetNumber",
-                        0,
-                      ],
-                    },
-                  },
+              // Remove MongoDB's _id from statistics
+              {
+                $project: {
+                  _id: 0,
                 },
               },
             ],
@@ -600,18 +466,6 @@ export class ServiceServices {
 
         totalCompletedServices: 0,
         totalCompletedValue: 0,
-
-        totalWeeklyServices: 0,
-        totalWeeklyValue: 0,
-
-        totalWeeklyNewServices: 0,
-        totalWeeklyNewValue: 0,
-
-        totalWeeklyPendingServices: 0,
-        totalWeeklyPendingValue: 0,
-
-        totalWeeklyCompletedServices: 0,
-        totalWeeklyCompletedValue: 0,
       };
 
       return {
