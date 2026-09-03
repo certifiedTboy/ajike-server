@@ -116,6 +116,7 @@ export class UserControllers {
                 email: result.email,
                 role: result.role || "user",
                 picture: result.picture || "",
+                phoneNumber: result?.phoneNumber || "",
             };
             ResponseHandler.ok(res, 200, "user profile fetched successfully", user);
         }
@@ -136,16 +137,35 @@ export class UserControllers {
         try {
             if (req?.query?.page) {
                 const page = parseInt(req.query.page);
-                const limit = 1;
+                const limit = 20;
                 const result = await UserServices.getAllUsers(limit, page);
                 ResponseHandler.ok(res, 200, "Users fetched successfully", result);
             }
             else {
                 const page = 1;
-                const limit = parseInt(req.query.limit) || 30;
+                const limit = 20;
                 const result = await UserServices.getAllUsers(limit, page);
                 ResponseHandler.ok(res, 200, "Users fetched successfully", result);
             }
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    /**
+     * @static
+     * @async
+     * @method updateUserProfile
+     * @description updates user profile
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     */
+    static async udpateUserProfile(req, res, next) {
+        try {
+            const userId = req?.user?.id;
+            const result = await UserServices.updateUserData({ _id: userId }, { $set: { ...req.body } });
+            ResponseHandler.ok(res, 200, "profile updated", result);
         }
         catch (error) {
             next(error);

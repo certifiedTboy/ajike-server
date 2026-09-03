@@ -125,8 +125,6 @@ export class UserServices {
      * @description Creates a new user for google loginnds a verification OTP.
      * Otherwise, it creates a new user record in the database.
      * @param {IUser} userData - The data for the new user, including name, email, and password.
-     * @returns {Promise<IUser>} A promise that resolves to an object containing the user's email.
-     * @throws {HttpException} If the user already exists and is verified.
      */
     static async createGoogleUser(userData) {
         const userExist = await this.checkIfUserExistByEmail(userData.email);

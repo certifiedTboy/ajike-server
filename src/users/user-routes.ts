@@ -52,10 +52,15 @@ export class UserRoutes extends AppRoutesHandler {
     this.routes.patch(
       "/update-password",
       AppHelpers.sanitizeBody,
-
       this.getUpdatePasswordValidationRules(),
       this.checkValidationResult,
       UserControllers.updatePassword,
+    );
+
+    this.routes.put(
+      "/profile/update",
+      this.authGuard,
+      UserControllers.udpateUserProfile,
     );
 
     this.routes.get("/", this.adminGuard, UserControllers.getAllUsers);

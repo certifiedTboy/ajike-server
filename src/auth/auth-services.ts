@@ -66,6 +66,7 @@ export class AuthServices {
         email: userExist.email,
         role: userExist.role || "user",
         picture: userExist.picture || "",
+        phoneNumber: userExist?.phoneNumber ?? "",
       },
     };
   }
@@ -119,6 +120,7 @@ export class AuthServices {
         email: user.email,
         role: user.role || "user",
         picture: user.picture,
+        phoneNumber: user?.phoneNumber || "",
       },
     };
   }

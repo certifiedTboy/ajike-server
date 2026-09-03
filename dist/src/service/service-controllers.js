@@ -28,13 +28,13 @@ export class ServiceControllers {
         try {
             if (!req?.query?.page) {
                 const page = 1;
-                const limit = 30;
+                const limit = 20;
                 const result = await ServiceServices.getServicesByUser(limit, page, req?.user?.id);
                 ResponseHandler.ok(res, 200, "services fetched successfully", result);
             }
             else {
                 const page = parseInt(req.query.page);
-                const limit = 30;
+                const limit = 20;
                 const result = await ServiceServices.getNewServicesByUser(limit, page, req?.user?.id);
                 ResponseHandler.ok(res, 200, "services fetched successfully", result);
             }
@@ -50,7 +50,7 @@ export class ServiceControllers {
     static async getAllServicesByAdmin(req, res, next) {
         try {
             const page = parseInt(req.query.page);
-            const limit = 2;
+            const limit = 20;
             const result = await ServiceServices.getAllServicesForAdmin(limit, page);
             ResponseHandler.ok(res, 200, "All services fetched successfully", result);
         }
@@ -119,7 +119,7 @@ export class ServiceControllers {
     static async getAllFeedbacks(req, res, next) {
         try {
             const page = parseInt(req.query.page);
-            const limit = 1;
+            const limit = 20;
             const result = await ServiceServices.getAllFeedbacks(page, limit);
             ResponseHandler.ok(res, 202, "retrieved feedbacks successfully.", result);
         }
