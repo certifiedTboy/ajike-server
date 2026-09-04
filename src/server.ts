@@ -9,7 +9,7 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://ajike-server.onrender.com",
+    origin: "https://ajike-pest-control.vercel.app",
   },
 });
 
