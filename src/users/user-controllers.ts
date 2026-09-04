@@ -30,9 +30,14 @@ export class UserControllers {
     try {
       const { firstName, lastName, email, password, phoneNumber } = req.body;
 
+      const newFirstName =
+        firstName?.charAt(0)?.toUpperCase() + firstName?.slice(1);
+      const newLastName =
+        lastName?.charAt(0)?.toUpperCase() + lastName?.slice(1);
+
       const result = await UserServices.createUser({
-        firstName,
-        lastName,
+        firstName: newFirstName,
+        lastName: newLastName,
         email,
         password,
         phoneNumber,
