@@ -24,6 +24,7 @@ export class UserRoutes extends AppRoutesHandler {
         this.routes.patch("/reset-password", AppHelpers.sanitizeBody, this.getPasswordResetRequestValidationRules(), this.checkValidationResult, UserControllers.requestPasswordReset);
         this.routes.patch("/update-password", AppHelpers.sanitizeBody, this.getUpdatePasswordValidationRules(), this.checkValidationResult, UserControllers.updatePassword);
         this.routes.put("/profile/update", this.authGuard, UserControllers.udpateUserProfile);
+        this.routes.put("/profile/:id/update", this.adminGuard, UserControllers.udpateUser);
         this.routes.get("/", this.adminGuard, UserControllers.getAllUsers);
         this.routes.delete("/delete", this.authGuard, UserControllers.deleteUserAccount);
         this.routes.post("/news-letters", AppHelpers.sanitizeBody, this.getNewsLettersValidationRules(), this.checkValidationResult, UserControllers.addNewEmailToNewLetters);

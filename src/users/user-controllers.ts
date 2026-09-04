@@ -171,6 +171,34 @@ export class UserControllers {
   /**
    * @static
    * @async
+   * @method updateUser
+   * @description updates user profile
+   * @param {Request} req
+   * @param {Response} res
+   * @param {NextFunction} next
+   */
+  public static async udpateUser(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const userId = req?.params?.id;
+
+      const result = await UserServices.updateUserData(
+        { _id: userId },
+        { $set: { ...req.body } },
+      );
+
+      ResponseHandler.ok(res, 200, "profile updated", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @static
+   * @async
    * @method getAllUsers
    * @description Handles fetching all users for an admin.
    * @param {Request} req - The Express request object.

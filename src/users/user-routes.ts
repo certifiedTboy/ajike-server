@@ -63,6 +63,12 @@ export class UserRoutes extends AppRoutesHandler {
       UserControllers.udpateUserProfile,
     );
 
+    this.routes.put(
+      "/profile/:id/update",
+      this.adminGuard,
+      UserControllers.udpateUser,
+    );
+
     this.routes.get("/", this.adminGuard, UserControllers.getAllUsers);
     this.routes.delete(
       "/delete",
