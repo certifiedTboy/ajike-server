@@ -3,7 +3,9 @@ import { MailtrapTransport, MailtrapClient } from "mailtrap";
 import ejs from "ejs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { SMTP_API_KEY, EMAIL_FROM } from "../lib/constants.ts";
+import { SMTP_API_KEY, EMAIL_FROM, AWS_LAMBDA_URL } from "../lib/constants.ts";
+import { logger } from "../lib/App.ts";
+import axios from "axios";
 
 /**
  * @class EmailService
@@ -53,9 +55,10 @@ class EmailService {
       const mailOptions = { from: sender, to: [...to], subject, html };
 
       await this.transporter.sendMail(mailOptions);
+
+      logger.info("email sent success");
     } catch (error) {
-      console.error("Error sending email:", error);
-      throw new Error("Could not send email.");
+      logger.error("could not send email", error);
     }
   }
 
@@ -96,8 +99,46 @@ class EmailService {
 
       await this.mailtrapClient.send(mailOptions);
     } catch (error) {
-      console.error("Error sending email:", error);
-      throw new Error("Could not send email.");
+      logger.error("error send bulk email", error);
+    }
+  }
+
+  /**
+   * Sends an email through aws lambda.
+   * @param to - The recipient's email address.
+   * @param subject - The subject of the email.
+   * @param template - The name of the EJS template file (without the .ejs extension).
+   * @param data - The data to pass to the EJS template.
+   */
+  public async sendEmailWithLambda<T>(
+    to: string,
+    subject: string,
+    template: string,
+    data: { [key: string]: T },
+  ): Promise<void> {
+    try {
+      if (!AWS_LAMBDA_URL) return console.log("LAMBDA URL is required");
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+
+      const result = await axios.post(
+        AWS_LAMBDA_URL,
+        {
+          to,
+          subject,
+          emailType: template,
+          ...data,
+        },
+        config,
+      );
+
+      logger.info("email sent successfully", result?.data);
+    } catch (error) {
+      logger.error("error sending email with lambda", error);
     }
   }
 }

@@ -3,7 +3,7 @@ import cron, { type ScheduledTask } from "node-cron";
 import EmailService from "./smtp.ts";
 import { type IEventData, type EventTypes } from "../lib/types.ts";
 import { ServiceServices } from "../service/service-services.ts";
-import { EMAIL_FROM } from "../lib/constants.ts";
+import { EMAIL_FROM, CLIENT_URL } from "../lib/constants.ts";
 import { UserServices } from "../users/user-services.ts";
 import { logger } from "../lib/App.ts";
 
@@ -190,8 +190,15 @@ export class AppEvents extends EventEmitter {
     switch (name) {
       case "new-user":
         // Use the EmailService to send a welcome email with the OTP.
-        await EmailService.sendEmail(
-          [eventData?.email!],
+        // await EmailService.sendEmail(
+        //   [eventData?.email!],
+        //   "Welcome! Verify Your Account",
+        //   "create-account",
+        //   { name: eventData.firstName, otp: eventData.otp },
+        // );
+
+        await EmailService.sendEmailWithLambda(
+          eventData?.email,
           "Welcome! Verify Your Account",
           "create-account",
           { name: eventData.firstName, otp: eventData.otp },
@@ -201,18 +208,33 @@ export class AppEvents extends EventEmitter {
         break;
 
       case "user-verified":
-        await EmailService.sendEmail(
-          [eventData?.email!],
+        // await EmailService.sendEmail(
+        //   [eventData?.email!],
+        //   "Account Verified!",
+        //   "account-verified",
+        //   { name: eventData.firstName },
+        // );
+
+        await EmailService.sendEmailWithLambda(
+          eventData?.email,
           "Account Verified!",
           "account-verified",
           { name: eventData.firstName },
         );
+
         logger.info(`Verification email sent to ${eventData.email}`);
         break;
 
       case "password-reset":
-        await EmailService.sendEmail(
-          [eventData?.email!],
+        // await EmailService.sendEmail(
+        //   [eventData?.email!],
+        //   "Password Reset Request",
+        //   "password-reset",
+        //   { name: eventData.firstName, otp: eventData.otp },
+        // );
+
+        await EmailService.sendEmailWithLambda(
+          eventData?.email,
           "Password Reset Request",
           "password-reset",
           { name: eventData.firstName, otp: eventData.otp },
@@ -221,8 +243,15 @@ export class AppEvents extends EventEmitter {
         break;
 
       case "password-changed":
-        await EmailService.sendEmail(
-          [eventData?.email!],
+        // await EmailService.sendEmail(
+        //   [eventData?.email!],
+        //   "Your Password Has Been Changed",
+        //   "password-changed",
+        //   { name: eventData.firstName },
+        // );
+
+        await EmailService.sendEmailWithLambda(
+          eventData?.email,
           "Your Password Has Been Changed",
           "password-changed",
           { name: eventData.firstName },
@@ -278,8 +307,28 @@ export class AppEvents extends EventEmitter {
           const data = eventData?.serviceData;
 
           if (EMAIL_FROM) {
-            await EmailService.sendEmail(
-              ["etosin70@gmail.com"],
+            // await EmailService.sendEmail(
+            //   ["etosin70@gmail.com"],
+            //   "New Service request",
+            //   "new-service",
+            //   {
+            //     title: data?.title || "New cleaning service",
+            //     status: data?.status || "New",
+            //     propertyType: data?.propertyType || "Not Provided",
+            //     category: data?.category || "Not Provided",
+            //     serviceLocation: data?.serviceLocation || "Not Provided",
+            //     plan: data?.plan || "Not Provided",
+            //     budget: data?.budget || "Not Provided",
+            //     address: data?.address || "Not Provided",
+            //     name: user?.firstName + " " + user?.lastName,
+            //     summary: data?.description,
+            //     phoneNumber: user?.phoneNumber,
+            //     email: user?.email,
+            //   },
+            // );
+
+            await EmailService.sendEmailWithLambda(
+              "etosin70@gmail.com",
               "New Service request",
               "new-service",
               {
@@ -287,7 +336,9 @@ export class AppEvents extends EventEmitter {
                 status: data?.status || "New",
                 propertyType: data?.propertyType || "Not Provided",
                 category: data?.category || "Not Provided",
-                serviceLocation: data?.serviceLocation || "Not Provided",
+                serviceLocation:
+                  `${data?.serviceCity}, ${data?.serviceState}` ||
+                  "Not Provided",
                 plan: data?.plan || "Not Provided",
                 budget: data?.budget || "Not Provided",
                 address: data?.address || "Not Provided",
@@ -295,6 +346,7 @@ export class AppEvents extends EventEmitter {
                 summary: data?.description,
                 phoneNumber: user?.phoneNumber,
                 email: user?.email,
+                dashboardURl: `${CLIENT_URL}/admin/dashboard/services/${data?._id}`,
               },
             );
 
@@ -303,16 +355,29 @@ export class AppEvents extends EventEmitter {
             );
           }
           if (user) {
-            await EmailService.sendEmail(
-              [user?.email],
+            // await EmailService.sendEmail(
+            //   [user?.email],
+            //   "Your Service request has been received",
+            //   "new-service-user",
+            //   {
+            //     title: data?.title || "New cleaning service",
+            //     status: data?.status || "New",
+            //     name: user?.firstName + " " + user?.lastName,
+            //   },
+            // );
+
+            await EmailService.sendEmailWithLambda(
+              user?.email,
               "Your Service request has been received",
               "new-service-user",
               {
                 title: data?.title || "New cleaning service",
                 status: data?.status || "New",
                 name: user?.firstName + " " + user?.lastName,
+                dashboardURl: `${CLIENT_URL}/dashboard/services/${data?._id}`,
               },
             );
+
             logger.info(
               `New service request update has been sent to ${user?.email}`,
             );
@@ -329,8 +394,21 @@ export class AppEvents extends EventEmitter {
           const data = eventData?.serviceData;
 
           if (user) {
-            await EmailService.sendEmail(
-              [user?.email!],
+            // await EmailService.sendEmail(
+            //   [user?.email!],
+            //   "Your service has a new status",
+            //   "update-service",
+            //   {
+            //     title: data?.title,
+            //     status: data?.status,
+            //     category: data?.category,
+            //     propertyType: data?.propertyType,
+            //     name: user?.firstName,
+            //   },
+            // );
+
+            await EmailService.sendEmailWithLambda(
+              user?.email,
               "Your service has a new status",
               "update-service",
               {
@@ -339,6 +417,7 @@ export class AppEvents extends EventEmitter {
                 category: data?.category,
                 propertyType: data?.propertyType,
                 name: user?.firstName,
+                dashboardURl: `${CLIENT_URL}/dashboard/services/${data?._id}`,
               },
             );
           }

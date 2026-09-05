@@ -10,3 +10,4 @@ export const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN;
 export const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID;
 export const OAUTH_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;
 export const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+export const AWS_LAMBDA_URL = process.env.AWS_LAMBDA_URL;
