@@ -5,7 +5,7 @@ import User, {
   type IUser,
 } from "./user.model.ts";
 import { AppHelpers } from "../helpers/app-helpers.ts";
-// import eventEmitter from "../helpers/events.ts";
+import eventEmitter from "../helpers/events.ts";
 
 /**
  * @class UserServices
@@ -46,13 +46,13 @@ export class UserServices {
         },
       );
 
-      // eventEmitter.emitEvent("new-user", {
-      //   id: newUser?.email,
-      //   email: newUser.email,
-      //   firstName: newUser.firstName,
-      //   otp: newUser.otp!,
-      //   delayInMinutes: 0.5,
-      // });
+      eventEmitter.emitEvent("new-user", {
+        id: newUser?.email,
+        email: newUser.email,
+        firstName: newUser.firstName,
+        otp: newUser.otp!,
+        delayInMinutes: 0.5,
+      });
 
       return { email: newUser.email };
     }
@@ -65,13 +65,13 @@ export class UserServices {
       password: await AppHelpers.hashPassword(userData.password!),
     });
 
-    // eventEmitter.emitEvent("new-user", {
-    //   id: newUser?.email,
-    //   email: newUser.email,
-    //   firstName: newUser.firstName,
-    //   otp: newUser.otp!,
-    //   delayInMinutes: 0.5,
-    // });
+    eventEmitter.emitEvent("new-user", {
+      id: newUser?.email,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      otp: newUser.otp!,
+      delayInMinutes: 0.5,
+    });
 
     return { email: newUser.email };
   }
@@ -103,13 +103,13 @@ export class UserServices {
       },
     );
 
-    // eventEmitter.emitEvent("password-reset", {
-    //   id: newUser?.email,
-    //   email: newUser.email,
-    //   firstName: newUser?.firstName,
-    //   otp: newUser?.otp!,
-    //   delayInMinutes: 0.5,
-    // });
+    eventEmitter.emitEvent("password-reset", {
+      id: newUser?.email,
+      email: newUser.email,
+      firstName: newUser?.firstName,
+      otp: newUser?.otp!,
+      delayInMinutes: 0.5,
+    });
 
     return { email: newUser?.email };
   }
@@ -138,13 +138,13 @@ export class UserServices {
         $unset: { otp: 1, otpExpiry: 1 },
       },
     );
-    // eventEmitter.emitEvent("password-changed", {
-    //   id: updatedUser?.email,
-    //   email: updatedUser?.email,
-    //   firstName: updatedUser?.firstName,
-    //   otp: updatedUser?.otp!,
-    //   delayInMinutes: 0.5,
-    // });
+    eventEmitter.emitEvent("password-changed", {
+      id: updatedUser?.email,
+      email: updatedUser?.email,
+      firstName: updatedUser?.firstName,
+      otp: updatedUser?.otp!,
+      delayInMinutes: 0.5,
+    });
 
     return { email: updatedUser?.email };
   }
@@ -220,12 +220,12 @@ export class UserServices {
       throw new HttpException(500, "Failed to verify user.");
     }
 
-    // eventEmitter.emitEvent("user-verified", {
-    //   id: updatedUser.email,
-    //   firstName: updatedUser.firstName,
-    //   email: updatedUser.email,
-    //   delayInMinutes: 0.5,
-    // });
+    eventEmitter.emitEvent("user-verified", {
+      id: updatedUser.email,
+      firstName: updatedUser.firstName,
+      email: updatedUser.email,
+      delayInMinutes: 0.5,
+    });
     return { email: updatedUser?.email };
   }
 

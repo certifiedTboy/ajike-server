@@ -1,7 +1,7 @@
 import { HttpException } from "../lib/exceptions/http-exception.js";
 import User, { NewsLetter, } from "./user.model.js";
 import { AppHelpers } from "../helpers/app-helpers.js";
-// import eventEmitter from "../helpers/events.ts";
+import eventEmitter from "../helpers/events.js";
 /**
  * @class UserServices
  * @description This class provides services for user-related database operations.
@@ -35,13 +35,13 @@ export class UserServices {
                     password: await AppHelpers.hashPassword(userData?.password),
                 },
             });
-            // eventEmitter.emitEvent("new-user", {
-            //   id: newUser?.email,
-            //   email: newUser.email,
-            //   firstName: newUser.firstName,
-            //   otp: newUser.otp!,
-            //   delayInMinutes: 0.5,
-            // });
+            eventEmitter.emitEvent("new-user", {
+                id: newUser?.email,
+                email: newUser.email,
+                firstName: newUser.firstName,
+                otp: newUser.otp,
+                delayInMinutes: 0.5,
+            });
             return { email: newUser.email };
         }
         const newUser = await User.create({
@@ -51,13 +51,13 @@ export class UserServices {
             otpExpiry: new Date(Date.now() + 60 * 60 * 1000),
             password: await AppHelpers.hashPassword(userData.password),
         });
-        // eventEmitter.emitEvent("new-user", {
-        //   id: newUser?.email,
-        //   email: newUser.email,
-        //   firstName: newUser.firstName,
-        //   otp: newUser.otp!,
-        //   delayInMinutes: 0.5,
-        // });
+        eventEmitter.emitEvent("new-user", {
+            id: newUser?.email,
+            email: newUser.email,
+            firstName: newUser.firstName,
+            otp: newUser.otp,
+            delayInMinutes: 0.5,
+        });
         return { email: newUser.email };
     }
     /**
@@ -81,13 +81,13 @@ export class UserServices {
                 isVerified: false,
             },
         });
-        // eventEmitter.emitEvent("password-reset", {
-        //   id: newUser?.email,
-        //   email: newUser.email,
-        //   firstName: newUser?.firstName,
-        //   otp: newUser?.otp!,
-        //   delayInMinutes: 0.5,
-        // });
+        eventEmitter.emitEvent("password-reset", {
+            id: newUser?.email,
+            email: newUser.email,
+            firstName: newUser?.firstName,
+            otp: newUser?.otp,
+            delayInMinutes: 0.5,
+        });
         return { email: newUser?.email };
     }
     /**
@@ -109,13 +109,13 @@ export class UserServices {
             password: await AppHelpers.hashPassword(password),
             $unset: { otp: 1, otpExpiry: 1 },
         });
-        // eventEmitter.emitEvent("password-changed", {
-        //   id: updatedUser?.email,
-        //   email: updatedUser?.email,
-        //   firstName: updatedUser?.firstName,
-        //   otp: updatedUser?.otp!,
-        //   delayInMinutes: 0.5,
-        // });
+        eventEmitter.emitEvent("password-changed", {
+            id: updatedUser?.email,
+            email: updatedUser?.email,
+            firstName: updatedUser?.firstName,
+            otp: updatedUser?.otp,
+            delayInMinutes: 0.5,
+        });
         return { email: updatedUser?.email };
     }
     /**
@@ -171,12 +171,12 @@ export class UserServices {
             // This case should ideally not be hit if the user was found before.
             throw new HttpException(500, "Failed to verify user.");
         }
-        // eventEmitter.emitEvent("user-verified", {
-        //   id: updatedUser.email,
-        //   firstName: updatedUser.firstName,
-        //   email: updatedUser.email,
-        //   delayInMinutes: 0.5,
-        // });
+        eventEmitter.emitEvent("user-verified", {
+            id: updatedUser.email,
+            firstName: updatedUser.firstName,
+            email: updatedUser.email,
+            delayInMinutes: 0.5,
+        });
         return { email: updatedUser?.email };
     }
     /**

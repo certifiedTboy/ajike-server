@@ -87,7 +87,6 @@ class EmailService {
      * @param data - The data to pass to the EJS template.
      */
     async sendEmailWithLambda(to, subject, template, data) {
-        console.log("I am calle");
         try {
             if (!AWS_LAMBDA_URL)
                 return console.log("LAMBDA URL is required");
@@ -102,7 +101,6 @@ class EmailService {
                 emailType: template,
                 ...data,
             }, config);
-            console.log("it is doen", result?.data);
             logger.info("email sent successfully", result?.data);
         }
         catch (error) {

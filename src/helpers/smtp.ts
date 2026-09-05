@@ -116,7 +116,6 @@ class EmailService {
     template: string,
     data: { [key: string]: T },
   ): Promise<void> {
-    console.log("I am calle");
     try {
       if (!AWS_LAMBDA_URL) return console.log("LAMBDA URL is required");
 
@@ -137,7 +136,6 @@ class EmailService {
         config,
       );
 
-      console.log("it is doen", result?.data);
       logger.info("email sent successfully", result?.data);
     } catch (error) {
       console.log("catch error", error);
