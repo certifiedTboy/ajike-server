@@ -18,7 +18,11 @@ class ExpressApp extends App {
     }
 }
 const newApp = new ExpressApp({
-    origin: ["http://localhost:5173", "https://ajike-pest-control.vercel.app"],
+    origin: [
+        "http://localhost:5173",
+        "https://ajike-pest-control.vercel.app",
+        "https://www.ajikepestcontrol.com",
+    ],
     credentials: true,
 });
 const { app } = newApp;
