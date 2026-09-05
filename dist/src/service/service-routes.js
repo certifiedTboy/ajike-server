@@ -25,7 +25,7 @@ export class ServiceRoutes extends AppRoutesHandler {
         this.routes.get("/user/completed-services", this.authGuard, ServiceControllers.getAllCompletedServicesByUser);
         this.routes.post("/:serviceId/feedback", this.authGuard, this.getFeedbackValidationRules(), this.checkValidationResult, ServiceControllers.addFeedback);
         this.routes.get("/feedback", this.adminGuard, ServiceControllers.getAllFeedbacks);
-        this.routes.put("/:serviceId", this.authGuard, AppHelpers.sanitizeBody, this.getCreateServiceValidationRules(), this.checkValidationResult, ServiceControllers.updateService);
+        this.routes.put("/:serviceId", this.authGuard, AppHelpers.sanitizeBody, this.getUpdateServiceValidationRules(), this.checkValidationResult, ServiceControllers.updateService);
     }
     /**
      * @private getCreateUserValidationRules
@@ -143,6 +143,85 @@ export class ServiceRoutes extends AppRoutesHandler {
                 }
                 return true;
             }),
+        ];
+    }
+    /**
+     * @private getCreateUserValidationRules
+     * @description Returns an array of validation rules for the user creation endpoint.
+     * @returns {Array} An array of express-validator middleware.
+     */
+    getUpdateServiceValidationRules() {
+        return [
+            body("title")
+                .trim()
+                .isString()
+                .withMessage("title must be a string")
+                .notEmpty()
+                .withMessage("service title is required"),
+            body("description")
+                .trim()
+                .isString()
+                .withMessage("description must be a string")
+                .notEmpty()
+                .withMessage("Service description is required"),
+            body("propertyType")
+                .trim()
+                .isString()
+                .withMessage("Property type must be a string")
+                .notEmpty()
+                .withMessage("property type is required"),
+            body("budget")
+                .trim()
+                .isString()
+                .withMessage("Budget must be a string")
+                .notEmpty()
+                .withMessage("budget is required"),
+            body("address")
+                .trim()
+                .isString()
+                .withMessage("Address must be a string")
+                .notEmpty()
+                .withMessage("Address is required"),
+            body("plan")
+                .trim()
+                .isString()
+                .withMessage("Plan must be a string")
+                .notEmpty()
+                .withMessage("Plan is required"),
+            body("category")
+                .trim()
+                .isString()
+                .withMessage("Plan must be a string")
+                .notEmpty()
+                .withMessage("category is required"),
+            body("status")
+                .trim()
+                .isString()
+                .withMessage("Service Status must be a string")
+                .notEmpty()
+                .withMessage("Service status is required"),
+            body("serviceState")
+                .trim()
+                .isString()
+                .withMessage("Service state must be a string")
+                .notEmpty()
+                .withMessage("Service state is required"),
+            body("serviceCity")
+                .trim()
+                .isString()
+                .withMessage("City must be a string")
+                .notEmpty()
+                .withMessage("City is required"),
+            body("postcode")
+                .optional()
+                .isString()
+                .withMessage("postcode must be a string")
+                .trim()
+                .matches(/^\d{5}(-\d{4})?$/)
+                .withMessage("Enter a valid post code"),
+            body("preferredDate")
+                .notEmpty()
+                .withMessage("Service preferred dated is required"),
         ];
     }
     /**
