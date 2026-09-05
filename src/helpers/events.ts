@@ -3,7 +3,7 @@ import cron, { type ScheduledTask } from "node-cron";
 import EmailService from "./smtp.ts";
 import { type IEventData, type EventTypes } from "../lib/types.ts";
 import { ServiceServices } from "../service/service-services.ts";
-import { EMAIL_FROM, CLIENT_URL } from "../lib/constants.ts";
+import { EMAIL_FROM, CLIENT_URL, ADMIN_EMAIL } from "../lib/constants.ts";
 import { UserServices } from "../users/user-services.ts";
 import { logger } from "../lib/App.ts";
 
@@ -328,7 +328,7 @@ export class AppEvents extends EventEmitter {
             // );
 
             await EmailService.sendEmailWithLambda(
-              "etosin70@gmail.com",
+              ADMIN_EMAIL!,
               "New Service request",
               "new-service",
               {

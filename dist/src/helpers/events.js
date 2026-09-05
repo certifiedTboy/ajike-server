@@ -3,7 +3,7 @@ import cron, {} from "node-cron";
 import EmailService from "./smtp.js";
 import {} from "../lib/types.js";
 import { ServiceServices } from "../service/service-services.js";
-import { EMAIL_FROM, CLIENT_URL } from "../lib/constants.js";
+import { EMAIL_FROM, CLIENT_URL, ADMIN_EMAIL } from "../lib/constants.js";
 import { UserServices } from "../users/user-services.js";
 import { logger } from "../lib/App.js";
 /**
@@ -249,7 +249,7 @@ export class AppEvents extends EventEmitter {
                         //     email: user?.email,
                         //   },
                         // );
-                        await EmailService.sendEmailWithLambda("etosin70@gmail.com", "New Service request", "new-service", {
+                        await EmailService.sendEmailWithLambda(ADMIN_EMAIL, "New Service request", "new-service", {
                             title: data?.title || "New cleaning service",
                             status: data?.status || "New",
                             propertyType: data?.propertyType || "Not Provided",
