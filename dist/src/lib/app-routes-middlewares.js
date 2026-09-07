@@ -50,7 +50,11 @@ export class AppRoutesHandler {
                 next();
             }
             if (headerAuthToken) {
-                const payload = newJwt.verifyAccessToken(headerAuthToken);
+                if (headerAuthToken?.split(" ")[0] !== "Bearer") {
+                    throw new HttpException(403, "Invalid auth token");
+                }
+                const token = headerAuthToken.split(" ")[1];
+                const payload = newJwt.verifyAccessToken(token);
                 req.user = payload;
                 next();
             }
@@ -80,16 +84,31 @@ export class AppRoutesHandler {
      */
     adminGuard(req, _res, next) {
         try {
-            const authToken = req.cookies["authToken"];
-            if (!authToken) {
+            const cookieAuthToken = req.cookies["authToken"];
+            const headerAuthToken = req?.headers["authorization"];
+            if (!cookieAuthToken && !headerAuthToken) {
                 throw new HttpException(403, "Unauthorized");
             }
-            const payload = newJwt.verifyAccessToken(authToken);
-            if (payload.role !== "admin") {
-                throw new HttpException(403, "Unauthorized");
+            if (cookieAuthToken) {
+                const payload = newJwt.verifyAccessToken(cookieAuthToken);
+                if (payload.role !== "admin") {
+                    throw new HttpException(403, "Unauthorized");
+                }
+                req.user = payload;
+                next();
             }
-            req.user = payload;
-            next();
+            if (headerAuthToken) {
+                if (headerAuthToken?.split(" ")[0] !== "Bearer") {
+                    throw new HttpException(403, "Invalid auth token");
+                }
+                const token = headerAuthToken.split(" ")[1];
+                const payload = newJwt.verifyAccessToken(token);
+                if (payload.role !== "admin") {
+                    throw new HttpException(403, "Unauthorized");
+                }
+                req.user = payload;
+                next();
+            }
         }
         catch (error) {
             next(error);
