@@ -9,7 +9,7 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "ajikepestcontrol.com",
+    origin: "https://www.ajikepestcontrol.com",
   },
 });
 

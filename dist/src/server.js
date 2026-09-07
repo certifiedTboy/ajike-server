@@ -7,7 +7,7 @@ import { AppHelpers } from "./helpers/app-helpers.js";
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: "ajikepestcontrol.com",
+        origin: "https://www.ajikepestcontrol.com",
     },
 });
 async function startServer() {
