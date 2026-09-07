@@ -131,6 +131,7 @@ class EmailService {
           to,
           subject,
           emailType: template,
+          source: "ajike",
           ...data,
         },
         config,

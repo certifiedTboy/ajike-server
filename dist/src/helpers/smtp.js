@@ -99,6 +99,7 @@ class EmailService {
                 to,
                 subject,
                 emailType: template,
+                source: "ajike",
                 ...data,
             }, config);
             logger.info("email sent successfully", result?.data);
