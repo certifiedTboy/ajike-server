@@ -39,13 +39,21 @@ export class AppRoutesHandler {
      */
     authGuard(req, _res, next) {
         try {
-            const authToken = req.cookies["authToken"];
-            if (!authToken) {
+            const cookieAuthToken = req.cookies["authToken"];
+            const headerAuthToken = req?.headers["authorization"];
+            if (!cookieAuthToken && !headerAuthToken) {
                 throw new HttpException(403, "Unauthorized");
             }
-            const payload = newJwt.verifyAccessToken(authToken);
-            req.user = payload;
-            next();
+            if (cookieAuthToken) {
+                const payload = newJwt.verifyAccessToken(cookieAuthToken);
+                req.user = payload;
+                next();
+            }
+            if (headerAuthToken) {
+                const payload = newJwt.verifyAccessToken(headerAuthToken);
+                req.user = payload;
+                next();
+            }
         }
         catch (error) {
             if (error instanceof HttpException) {

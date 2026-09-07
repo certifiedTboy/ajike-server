@@ -74,7 +74,7 @@ export class ServiceRoutes extends AppRoutesHandler {
 
   /**
    * @private getCreateUserValidationRules
-   * @description Returns an array of validation rules for the user creation endpoint.
+   * @description Returns an array of validation rules for the service creation endpoint.
    * @returns {Array} An array of express-validator middleware.
    */
   private getCreateServiceValidationRules() {
@@ -207,8 +207,8 @@ export class ServiceRoutes extends AppRoutesHandler {
   }
 
   /**
-   * @private getCreateUserValidationRules
-   * @description Returns an array of validation rules for the user creation endpoint.
+   * @private getUpdateUserValidationRules
+   * @description Returns an array of validation rules for the service update endpoint.
    * @returns {Array} An array of express-validator middleware.
    */
   private getUpdateServiceValidationRules() {

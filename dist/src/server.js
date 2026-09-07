@@ -7,7 +7,7 @@ import { AppHelpers } from "./helpers/app-helpers.js";
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://ajike-pest-control.vercel.app",
+        origin: "http://localhost:5173",
     },
 });
 async function startServer() {

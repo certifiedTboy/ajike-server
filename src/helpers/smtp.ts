@@ -139,7 +139,7 @@ class EmailService {
 
       logger.info("email sent successfully", result?.data);
     } catch (error) {
-      console.log("catch error", error);
+      console.log(error);
       logger.error("error sending email with lambda", error);
     }
   }

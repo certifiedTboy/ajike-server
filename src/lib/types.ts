@@ -34,7 +34,12 @@ export type EventTypes =
   | "update-service"
   | "create-new-service"
   | "update-new-service"
-  | "add-service-feedback";
+  | "add-service-feedback"
+  | "update-user"
+  | "update-password-request"
+  | "request-password-reset"
+  | "verify-user-account"
+  | "create-new-user";
 
 export interface IJWTPayload {
   id: string;

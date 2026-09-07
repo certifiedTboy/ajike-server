@@ -43,6 +43,11 @@ export class AppEvents extends EventEmitter {
             "create-new-service",
             "add-service-feedback",
             "update-new-service",
+            "update-user",
+            "update-password-request",
+            "request-password-reset",
+            "verify-user-account",
+            "create-new-user",
         ];
         this.initializeListeners();
     }

@@ -129,25 +129,6 @@ export class UserControllers {
     /**
      * @static
      * @async
-     * @method updateUser
-     * @description updates user profile
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     */
-    static async udpateUser(req, res, next) {
-        try {
-            const userId = req?.params?.id;
-            const result = await UserServices.updateUserData({ _id: userId }, { $set: { ...req.body } });
-            ResponseHandler.ok(res, 200, "profile updated", result);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
-    /**
-     * @static
-     * @async
      * @method getAllUsers
      * @description Handles fetching all users for an admin.
      * @param {Request} req - The Express request object.
@@ -185,6 +166,25 @@ export class UserControllers {
     static async udpateUserProfile(req, res, next) {
         try {
             const userId = req?.user?.id;
+            const result = await UserServices.updateUserData({ _id: userId }, { $set: { ...req.body } });
+            ResponseHandler.ok(res, 200, "profile updated", result);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    /**
+     * @static
+     * @async
+     * @method updateUser
+     * @description updates user profile
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     */
+    static async udpateUser(req, res, next) {
+        try {
+            const userId = req?.params?.id;
             const result = await UserServices.updateUserData({ _id: userId }, { $set: { ...req.body } });
             ResponseHandler.ok(res, 200, "profile updated", result);
         }
