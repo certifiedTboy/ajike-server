@@ -47,7 +47,7 @@ export class AppRoutesHandler {
             if (cookieAuthToken) {
                 const payload = newJwt.verifyAccessToken(cookieAuthToken);
                 req.user = payload;
-                next();
+                return next();
             }
             if (headerAuthToken) {
                 if (headerAuthToken?.split(" ")[0] !== "Bearer") {
@@ -56,7 +56,7 @@ export class AppRoutesHandler {
                 const token = headerAuthToken.split(" ")[1];
                 const payload = newJwt.verifyAccessToken(token);
                 req.user = payload;
-                next();
+                return next();
             }
         }
         catch (error) {

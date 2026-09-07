@@ -75,7 +75,7 @@ export class AppRoutesHandler {
         const payload = newJwt.verifyAccessToken(cookieAuthToken);
 
         req.user = payload;
-        next();
+        return next();
       }
 
       if (headerAuthToken) {
@@ -87,7 +87,7 @@ export class AppRoutesHandler {
         const payload = newJwt.verifyAccessToken(token!);
 
         req.user = payload;
-        next();
+        return next();
       }
     } catch (error: unknown) {
       if (error instanceof HttpException) {
