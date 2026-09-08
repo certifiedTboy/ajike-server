@@ -1,4 +1,7 @@
-import type { CookieOptions, Response } from "express";
+import type {
+  // CookieOptions,
+  Response,
+} from "express";
 
 export class ResponseHandler {
   public static created(
@@ -30,18 +33,20 @@ export class ResponseHandler {
   }
 
   static auth(res: Response, statusCode: number, message: string, data?: any) {
-    const cookieOptions: CookieOptions = {
-      expires: new Date(Date.now() + 60 * 60 * 1000),
-      maxAge: 60 * 60 * 1000,
-      secure: true,
-      httpOnly: true,
-      sameSite: "none",
-    };
+    // const cookieOptions: CookieOptions = {
+    //   expires: new Date(Date.now() + 60 * 60 * 1000),
+    //   maxAge: 60 * 60 * 1000,
+    //   secure: true,
+    //   httpOnly: true,
+    //   sameSite: "none",
+    // };
 
-    return res
-      .status(statusCode)
-      .cookie("authToken", data?.accessToken, cookieOptions)
-      .json({ message, authToken: data?.accessToken, data: data?.user });
+    return (
+      res
+        .status(statusCode)
+        // .cookie("authToken", data?.accessToken, cookieOptions)
+        .json({ message, authToken: data?.accessToken, data: data?.user })
+    );
   }
 
   static logout(

@@ -291,10 +291,6 @@ export class UserServices {
             normalizedServiceCount: {
               $ifNull: ["$serviceCount", 0],
             },
-
-            normalizedRequestCount: {
-              $ifNull: ["$requestCount", 0],
-            },
           },
         },
 
@@ -325,7 +321,6 @@ export class UserServices {
                   otpExpiry: 0,
                   normalizedRole: 0,
                   normalizedServiceCount: 0,
-                  normalizedRequestCount: 0,
                 },
               },
             ],
@@ -371,7 +366,7 @@ export class UserServices {
 
                   // Total requests by all users
                   totalRequests: {
-                    $sum: "$normalizedRequestCount",
+                    $sum: "$normalizedServiceCount",
                   },
                 },
               },

@@ -16,17 +16,17 @@ export class ResponseHandler {
         });
     }
     static auth(res, statusCode, message, data) {
-        const cookieOptions = {
-            expires: new Date(Date.now() + 60 * 60 * 1000),
-            maxAge: 60 * 60 * 1000,
-            secure: true,
-            httpOnly: true,
-            sameSite: "none",
-        };
-        return res
+        // const cookieOptions: CookieOptions = {
+        //   expires: new Date(Date.now() + 60 * 60 * 1000),
+        //   maxAge: 60 * 60 * 1000,
+        //   secure: true,
+        //   httpOnly: true,
+        //   sameSite: "none",
+        // };
+        return (res
             .status(statusCode)
-            .cookie("authToken", data?.accessToken, cookieOptions)
-            .json({ message, authToken: data?.accessToken, data: data?.user });
+            // .cookie("authToken", data?.accessToken, cookieOptions)
+            .json({ message, authToken: data?.accessToken, data: data?.user }));
     }
     static logout(res, statusCode, message, _data) {
         return res.status(statusCode).clearCookie("authToken").json({ message });

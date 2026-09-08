@@ -39,25 +39,17 @@ export class AppRoutesHandler {
      */
     authGuard(req, _res, next) {
         try {
-            const cookieAuthToken = req.cookies["authToken"];
             const headerAuthToken = req?.headers["authorization"];
-            if (!cookieAuthToken && !headerAuthToken) {
+            if (!headerAuthToken) {
                 throw new HttpException(403, "Unauthorized");
             }
-            if (cookieAuthToken) {
-                const payload = newJwt.verifyAccessToken(cookieAuthToken);
-                req.user = payload;
-                return next();
+            if (headerAuthToken?.split(" ")[0] !== "Bearer") {
+                throw new HttpException(403, "Invalid auth token");
             }
-            if (headerAuthToken) {
-                if (headerAuthToken?.split(" ")[0] !== "Bearer") {
-                    throw new HttpException(403, "Invalid auth token");
-                }
-                const token = headerAuthToken.split(" ")[1];
-                const payload = newJwt.verifyAccessToken(token);
-                req.user = payload;
-                return next();
-            }
+            const token = headerAuthToken.split(" ")[1];
+            const payload = newJwt.verifyAccessToken(token);
+            req.user = payload;
+            next();
         }
         catch (error) {
             if (error instanceof HttpException) {
@@ -84,31 +76,20 @@ export class AppRoutesHandler {
      */
     adminGuard(req, _res, next) {
         try {
-            const cookieAuthToken = req.cookies["authToken"];
             const headerAuthToken = req?.headers["authorization"];
-            if (!cookieAuthToken && !headerAuthToken) {
+            if (!headerAuthToken) {
                 throw new HttpException(403, "Unauthorized");
             }
-            if (cookieAuthToken) {
-                const payload = newJwt.verifyAccessToken(cookieAuthToken);
-                if (payload.role !== "admin") {
-                    throw new HttpException(403, "Unauthorized");
-                }
-                req.user = payload;
-                return next();
+            if (headerAuthToken?.split(" ")[0] !== "Bearer") {
+                throw new HttpException(403, "Invalid auth token");
             }
-            if (headerAuthToken) {
-                if (headerAuthToken?.split(" ")[0] !== "Bearer") {
-                    throw new HttpException(403, "Invalid auth token");
-                }
-                const token = headerAuthToken.split(" ")[1];
-                const payload = newJwt.verifyAccessToken(token);
-                if (payload.role !== "admin") {
-                    throw new HttpException(403, "Unauthorized");
-                }
-                req.user = payload;
-                return next();
+            const token = headerAuthToken.split(" ")[1];
+            const payload = newJwt.verifyAccessToken(token);
+            if (payload.role !== "admin") {
+                throw new HttpException(403, "Unauthorized");
             }
+            req.user = payload;
+            next();
         }
         catch (error) {
             next(error);
