@@ -132,7 +132,7 @@ export class AppRoutesHandler {
         }
 
         req.user = payload;
-        next();
+        return next();
       }
 
       if (headerAuthToken) {
@@ -148,7 +148,7 @@ export class AppRoutesHandler {
         }
 
         req.user = payload;
-        next();
+        return next();
       }
     } catch (error) {
       next(error);

@@ -95,7 +95,7 @@ export class AppRoutesHandler {
                     throw new HttpException(403, "Unauthorized");
                 }
                 req.user = payload;
-                next();
+                return next();
             }
             if (headerAuthToken) {
                 if (headerAuthToken?.split(" ")[0] !== "Bearer") {
@@ -107,7 +107,7 @@ export class AppRoutesHandler {
                     throw new HttpException(403, "Unauthorized");
                 }
                 req.user = payload;
-                next();
+                return next();
             }
         }
         catch (error) {
